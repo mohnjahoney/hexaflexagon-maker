@@ -63,11 +63,18 @@
   --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
   --color-paper: var(--paper);
   --color-paper-deep: var(--paper-deep);
+  --color-paper-muted: var(--paper-muted);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
+  --color-ink-strong: var(--ink-strong);
   --color-oxblood: var(--oxblood);
   --color-graphite: var(--graphite);
   --color-hairline: var(--hairline);
+  --color-face-fill-1: var(--face-fill-1);
+  --color-face-fill-2: var(--face-fill-2);
+  --color-face-fill-3: var(--face-fill-3);
+  --color-studio-ink: var(--studio-ink);
+  --color-white: var(--white);
   --shadow-sheet: 0 1px 0 oklch(0.92 0.012 80), 0 18px 40px -28px oklch(0.30 0.02 60 / 0.35);
 }
 
@@ -75,11 +82,18 @@
   --radius: 0.375rem;
   --paper: oklch(0.972 0.012 85);
   --paper-deep: oklch(0.945 0.014 82);
+  --paper-muted: oklch(0.933 0.018 81.3);
   --ink: oklch(0.205 0.015 60);
   --ink-soft: oklch(0.38 0.012 60);
+  --ink-strong: oklch(0.347 0.030 58.4);
   --oxblood: oklch(0.46 0.14 25);
   --graphite: oklch(0.55 0.008 60);
   --hairline: oklch(0.80 0.012 70);
+  --face-fill-1: oklch(0.927 0.026 84.6);
+  --face-fill-2: oklch(0.905 0.030 87.5);
+  --face-fill-3: oklch(0.878 0.037 87.8);
+  --studio-ink: oklch(0.252 0.057 258.3);
+  --white: oklch(1 0 0);
 
   --background: var(--paper);
   --foreground: var(--ink);

@@ -153,7 +153,15 @@ function FaceTriangleOverlay() {
       className="pointer-events-none absolute inset-0 h-full w-full"
     >
       {vertices.map(([x, y], index) => (
-        <line key={index} x1={centerX} y1="50" x2={x} y2={y} stroke="#faf7ef" strokeWidth="0.8" />
+        <line
+          key={index}
+          x1={centerX}
+          y1="50"
+          x2={x}
+          y2={y}
+          stroke="var(--color-paper)"
+          strokeWidth="0.8"
+        />
       ))}
       {Array.from({ length: 6 }, (_, index) => {
         const angle = (-60 + index * 60) * (Math.PI / 180);
@@ -161,11 +169,16 @@ function FaceTriangleOverlay() {
         const y = 50 + Math.sin(angle) * 11;
         return (
           <g key={index}>
-            <circle cx={x} cy={y} r="4.8" fill="rgba(42,33,23,0.82)" />
+            <circle
+              cx={x}
+              cy={y}
+              r="4.8"
+              fill="color-mix(in srgb, var(--color-ink) 82%, transparent)"
+            />
             <text
               x={x}
               y={y + 0.4}
-              fill="#faf7ef"
+              fill="var(--color-paper)"
               fontSize="6"
               textAnchor="middle"
               dominantBaseline="middle"

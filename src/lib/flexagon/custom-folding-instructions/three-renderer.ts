@@ -7,6 +7,7 @@ import {
   type Point3,
   type SurfaceId,
 } from "./folding-engine";
+import { themeColor } from "../../theme-colors";
 
 export interface ThreeInstructionAssets {
   front: HTMLCanvasElement;
@@ -45,11 +46,11 @@ export function createFoldingAnimationRenderer(
 ): FoldingAnimationRenderer {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(new THREE.Color("#f1eadc"), 1);
+  renderer.setClearColor(new THREE.Color(themeColor("paper-deep")), 1);
 
   const scene = new THREE.Scene();
-  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-  const light = new THREE.DirectionalLight(0xffffff, 1.8);
+  scene.add(new THREE.AmbientLight(themeColor("white"), 1.2));
+  const light = new THREE.DirectionalLight(themeColor("white"), 1.8);
   light.position.set(2.5, 4, 6);
   scene.add(light);
 
@@ -62,6 +63,7 @@ export function createFoldingAnimationRenderer(
   let currentVerticalOffset = 0;
   let hasCenteredVertically = false;
   let previousCenterTime = performance.now();
+  let previousRenderMode: "preparation" | "folded" | null = null;
 
   function resize() {
     const width = Math.max(1, canvas.clientWidth);
@@ -86,6 +88,10 @@ export function createFoldingAnimationRenderer(
   function render(state: FoldingState, options: FoldingAnimationFrameOptions = {}) {
     clearGroup(group, false);
     group.position.y = 0;
+    const renderMode = options.preparationFoldProgress !== undefined ? "preparation" : "folded";
+    const renderModeChanged = previousRenderMode !== null && previousRenderMode !== renderMode;
+    previousRenderMode = renderMode;
+
     if (options.preparationFoldProgress !== undefined) {
       addPreparationMeshes(group, assets, textures, options.preparationFoldProgress);
     } else {
@@ -104,7 +110,7 @@ export function createFoldingAnimationRenderer(
     const deltaSeconds = Math.min((now - previousCenterTime) / 1000, 0.1);
     previousCenterTime = now;
     const desiredVerticalOffset = verticalCenterOffset(group, target.y);
-    if (!hasCenteredVertically || options.snapVerticalCenter) {
+    if (!hasCenteredVertically || options.snapVerticalCenter || renderModeChanged) {
       currentVerticalOffset = desiredVerticalOffset;
       hasCenteredVertically = true;
     } else if (options.smoothVerticalCenter) {
@@ -145,7 +151,7 @@ function addPreparationMeshes(
   const clampedProgress = Math.max(0, Math.min(1, progress));
   const foldAngle = -Math.PI * clampedProgress;
   const paperInside = new THREE.MeshBasicMaterial({
-    color: 0xfaf7ef,
+    color: themeColor("paper"),
     side: THREE.FrontSide,
     polygonOffset: true,
     polygonOffsetFactor: -0.01,
@@ -247,11 +253,11 @@ export function renderFoldingStateWithThree(
   });
   renderer.setPixelRatio(1);
   renderer.setSize(canvas.width, canvas.height, false);
-  renderer.setClearColor(new THREE.Color(options.background ?? "#f1eadc"), 1);
+  renderer.setClearColor(new THREE.Color(options.background ?? themeColor("paper-deep")), 1);
 
   const scene = new THREE.Scene();
-  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-  const light = new THREE.DirectionalLight(0xffffff, 1.8);
+  scene.add(new THREE.AmbientLight(themeColor("white"), 1.2));
+  const light = new THREE.DirectionalLight(themeColor("white"), 1.8);
   light.position.set(2.5, 4, 6);
   scene.add(light);
 
@@ -340,7 +346,7 @@ function addSurfaceMeshes(
       const overlay = new THREE.Mesh(
         geometry.clone(),
         new THREE.MeshBasicMaterial({
-          color: 0x7a3b2c,
+          color: themeColor("oxblood"),
           opacity: 0.22,
           transparent: true,
           side: THREE.DoubleSide,

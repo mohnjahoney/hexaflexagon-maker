@@ -41,7 +41,7 @@ const image = (
   rotation: TriangleRotation = 0,
 ): ImageStripSlot => ({ kind: "image", face, triangle, rotation });
 
-const blank = (text = "Glue"): BlankStripSlot => ({ kind: "blank", text });
+const blank = (text = "GLUE"): BlankStripSlot => ({ kind: "blank", text });
 
 /**
  * One logical two-sided strip. Slot indexes run from left to right before the

@@ -19,7 +19,9 @@ import {
   type TenStripSlots,
 } from "./strip-config";
 import { drawTriangleImage, extractTriangleImages, type TriangleImages } from "./triangles";
-import { drawQR, STUDIO_PIQUE_QR_COLORS } from "../qr";
+import { themeColor, themeRgba } from "../theme-colors";
+import { STUDIO_PIQUE_CREDIT } from "./features";
+import { drawStudioPiqueSupportCard } from "./support-card";
 
 export interface FaceImages {
   face1: string | null;
@@ -69,41 +71,101 @@ async function loadOptionalImage(src: string | null): Promise<HTMLImageElement |
   }
 }
 
-function drawSheetChrome(
-  ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
-  label: string,
-  dpi: number,
-) {
-  ctx.fillStyle = "#faf7ef";
+function drawSheetChrome(ctx: CanvasRenderingContext2D, w: number, h: number, dpi: number) {
+  ctx.fillStyle = themeColor("paper");
   ctx.fillRect(0, 0, w, h);
 
   // very faint margin guide
-  ctx.strokeStyle = "rgba(120,110,95,0.22)";
+  ctx.strokeStyle = themeRgba("graphite", 0.22);
   ctx.lineWidth = Math.max(1, dpi / 300);
   ctx.setLineDash([dpi / 50, dpi / 25]);
   const m = MARGIN_IN * dpi;
   ctx.strokeRect(m, m, w - 2 * m, h - 2 * m);
   ctx.setLineDash([]);
 
-  ctx.fillStyle = "#6a5f50";
-  ctx.font = `400 ${0.1 * dpi}px "Inter Tight", system-ui, sans-serif`;
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText(label.toUpperCase(), m, m - 0.12 * dpi);
+  drawCutFoldLegend(ctx, m, m - 0.12 * dpi, dpi);
+  drawStudioPiqueCredit(ctx, w, m, dpi);
+}
+
+function drawCutFoldLegend(
+  ctx: CanvasRenderingContext2D,
+  startX: number,
+  baselineY: number,
+  dpi: number,
+) {
+  const fontSize = 0.14 * dpi;
+  const sampleW = 0.3 * dpi;
+  const gap = 0.12 * dpi;
+  const textGap = 0.08 * dpi;
+  const cutLabel = "CUT";
+  const foldLabel = "FOLD";
+  ctx.save();
+  ctx.font = `500 ${fontSize}px "Inter Tight", system-ui, sans-serif`;
+  let x = startX;
+
+  ctx.strokeStyle = themeColor("oxblood");
+  ctx.lineWidth = (4 / 600) * dpi;
+  ctx.beginPath();
+  ctx.moveTo(x, baselineY - fontSize * 0.35);
+  ctx.lineTo(x + sampleW, baselineY - fontSize * 0.35);
+  ctx.stroke();
+  x += sampleW + textGap;
+
+  ctx.fillStyle = themeColor("ink-soft");
+  ctx.textAlign = "left";
+  ctx.fillText(cutLabel, x, baselineY);
+  x += ctx.measureText(cutLabel).width + gap;
+
+  // A dark under-stroke keeps the white fold sample visible on the paper key.
+  ctx.strokeStyle = themeColor("ink");
+  ctx.lineWidth = Math.max(1, (6 / 600) * dpi);
+  ctx.beginPath();
+  ctx.moveTo(x, baselineY - fontSize * 0.35);
+  ctx.lineTo(x + sampleW, baselineY - fontSize * 0.35);
+  ctx.stroke();
+  ctx.strokeStyle = themeColor("white");
+  ctx.lineWidth = (2 / 600) * dpi;
+  ctx.beginPath();
+  ctx.moveTo(x, baselineY - fontSize * 0.35);
+  ctx.lineTo(x + sampleW, baselineY - fontSize * 0.35);
+  ctx.stroke();
+  x += sampleW + textGap;
+  ctx.fillStyle = themeColor("ink-soft");
+  ctx.fillText(foldLabel, x, baselineY);
+  ctx.restore();
 }
 
 function drawSheetBackground(ctx: CanvasRenderingContext2D, w: number, h: number, dpi: number) {
-  ctx.fillStyle = "#faf7ef";
+  ctx.fillStyle = themeColor("paper");
   ctx.fillRect(0, 0, w, h);
 
   // very faint margin guide
-  ctx.strokeStyle = "rgba(120,110,95,0.22)";
+  ctx.strokeStyle = themeRgba("graphite", 0.22);
   ctx.lineWidth = Math.max(1, dpi / 300);
   ctx.setLineDash([dpi / 50, dpi / 25]);
   const m = MARGIN_IN * dpi;
   ctx.strokeRect(m, m, w - 2 * m, h - 2 * m);
   ctx.setLineDash([]);
+  drawCutFoldLegend(ctx, m, m - 0.12 * dpi, dpi);
+  drawStudioPiqueCredit(ctx, w, m, dpi);
+}
+
+function drawStudioPiqueCredit(
+  ctx: CanvasRenderingContext2D,
+  pageW: number,
+  margin: number,
+  dpi: number,
+) {
+  if (STUDIO_PIQUE_CREDIT !== "simple-name") return;
+
+  ctx.save();
+  ctx.fillStyle = themeRgba("studio-ink", 0.62);
+  // 14 pt at the target DPI: (14 / 72) inch × dpi.
+  ctx.font = `400 ${(14 / 72) * dpi}px "Inter Tight", system-ui, sans-serif`;
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("made by Studio Pique", pageW - margin, margin - 0.12 * dpi);
+  ctx.restore();
 }
 
 function clipPolygon(ctx: CanvasRenderingContext2D, pts: Point[]) {
@@ -161,7 +223,8 @@ function drawBlankSlot(
   slot: BlankStripSlot,
   dpi: number,
 ) {
-  fillTriangle(ctx, pts, "#efe8dc");
+  // fillTriangle(ctx, pts, themeColor("paper-muted"));
+  fillTriangle(ctx, pts, themeColor("white"));
   if (!slot.text) return;
 
   const cx = (pts[0].x + pts[1].x + pts[2].x) / 3;
@@ -170,8 +233,9 @@ function drawBlankSlot(
   ctx.save();
   ctx.translate(cx, cy);
   if (!apexUp) ctx.rotate(Math.PI);
-  ctx.fillStyle = "#7a3b2c";
-  ctx.font = `500 ${0.15 * dpi}px "Inter Tight", system-ui, sans-serif`;
+  ctx.fillStyle = themeColor("ink");
+  // ctx.fillStyle = themeColor("oxblood");
+  ctx.font = `500 ${0.25 * dpi}px "Inter Tight", system-ui, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(slot.text, 0, 0, 0.7 * dpi);
@@ -221,12 +285,12 @@ function drawStripDebugLabel(
   const boxHeight = 0.48 * dpi;
 
   ctx.save();
-  ctx.fillStyle = "rgba(250,247,239,0.86)";
-  ctx.strokeStyle = "rgba(70,54,42,0.45)";
+  ctx.fillStyle = themeRgba("paper", 0.86);
+  ctx.strokeStyle = themeRgba("ink-strong", 0.45);
   ctx.lineWidth = Math.max(1, dpi / 400);
   ctx.fillRect(cx - boxWidth / 2, cy - boxHeight / 2, boxWidth, boxHeight);
   ctx.strokeRect(cx - boxWidth / 2, cy - boxHeight / 2, boxWidth, boxHeight);
-  ctx.fillStyle = "#46362a";
+  ctx.fillStyle = themeColor("ink-strong");
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `600 ${0.16 * dpi}px "Inter Tight", system-ui, sans-serif`;
@@ -249,8 +313,8 @@ function drawStripOutline(
   dpi: number,
 ) {
   const h = (s * SQRT3) / 2;
-  ctx.strokeStyle = "#2a2117";
-  ctx.lineWidth = Math.max(1.5, dpi / 250);
+  ctx.strokeStyle = themeColor("oxblood");
+  ctx.lineWidth = (4 / 600) * dpi;
   ctx.lineJoin = "miter";
   ctx.beginPath();
   ctx.moveTo(ox, oy);
@@ -268,9 +332,7 @@ function drawFoldLines(
   oy: number,
   dpi: number,
 ) {
-  ctx.strokeStyle = "#7a3b2c";
-  ctx.lineWidth = Math.max(0.8, dpi / 500);
-  ctx.setLineDash([dpi / 40, dpi / 60]);
+  const lines: Array<[Point, Point]> = [];
   for (let i = 1; i < 10; i++) {
     const previous = triangleVertices(i - 1, s, ox, oy);
     const current = triangleVertices(i, s, ox, oy);
@@ -278,12 +340,27 @@ function drawFoldLines(
       current.some((candidate) => candidate.x === point.x && candidate.y === point.y),
     );
     if (shared.length !== 2) continue;
+    lines.push([shared[0], shared[1]]);
+  }
+
+  ctx.save();
+  ctx.strokeStyle = themeRgba("ink", 0.28);
+  ctx.lineWidth = (3 / 600) * dpi;
+  for (const [start, end] of lines) {
     ctx.beginPath();
-    ctx.moveTo(shared[0].x, shared[0].y);
-    ctx.lineTo(shared[1].x, shared[1].y);
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
     ctx.stroke();
   }
-  ctx.setLineDash([]);
+  ctx.strokeStyle = themeColor("white");
+  ctx.lineWidth = (2 / 600) * dpi;
+  for (const [start, end] of lines) {
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 /** Render a single strip (front or back) at origin (ox, oy) on `ctx`. */
@@ -357,62 +434,12 @@ function drawSingleSidedDoubleStrip(
 
   // Centre seam — fold line where the user folds the sheet in half.
   ctx.save();
-  ctx.strokeStyle = "#2a2117";
-  ctx.setLineDash([dpi / 25, dpi / 40]);
-  ctx.lineWidth = Math.max(1, dpi / 400);
+  ctx.strokeStyle = themeColor("white");
+  ctx.lineWidth = (2 / 600) * dpi;
   ctx.beginPath();
-  ctx.moveTo(ox + s / 2, oy + stripH);
+  ctx.moveTo(ox, oy + stripH);
   ctx.lineTo(ox + 5.5 * s, oy + stripH);
   ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-}
-
-async function drawSupportCard(
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  topY: number,
-  maxW: number,
-  maxH: number,
-  dpi: number,
-) {
-  const cardW = Math.min(maxW, maxH * 5.8);
-  const cardH = maxH;
-  const x = centerX - cardW / 2;
-  const y = topY;
-  const pad = Math.max(0.08 * dpi, cardH * 0.08);
-  const qrSize = Math.max(0, cardH - 2 * pad);
-  const textX = x + pad + qrSize + pad * 0.9;
-  const textW = Math.max(0, cardW - (textX - x) - pad);
-
-  ctx.save();
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "rgba(16,34,61,0.18)";
-  ctx.lineWidth = Math.max(1, dpi / 450);
-  ctx.beginPath();
-  ctx.roundRect(x, y, cardW, cardH, Math.min(0.12 * dpi, cardH * 0.18));
-  ctx.fill();
-  ctx.stroke();
-
-  await drawQR(ctx, "studiopique", "venmo", {
-    x: x + pad,
-    y: y + pad,
-    size: qrSize,
-    sizePx: Math.ceil(qrSize),
-    note: "Studio Pique flexagon",
-    darkColor: STUDIO_PIQUE_QR_COLORS.ink,
-    lightColor: STUDIO_PIQUE_QR_COLORS.paper,
-  });
-
-  ctx.fillStyle = "#10223d";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.font = `600 ${Math.min(0.24 * dpi, cardH * 0.24)}px "Fraunces", Georgia, serif`;
-  ctx.fillText("Studio Pique", textX, y + cardH * 0.42, textW);
-  // ctx.font = `500 ${Math.min(0.115 * dpi, cardH * 0.13)}px "Inter Tight", system-ui, sans-serif`;
-  ctx.font = `500 ${Math.min(0.15 * dpi, cardH * 0.15)}px "Inter Tight", system-ui, sans-serif`;
-  ctx.fillStyle = "rgba(16,34,61,0.78)";
-  ctx.fillText("Support the studio - hope you have fun!", textX, y + cardH * 0.64, textW);
   ctx.restore();
 }
 
@@ -437,7 +464,11 @@ export async function renderSheets(
     2: img2 ? extractTriangleImages(img2) : null,
     3: img3 ? extractTriangleImages(img3) : null,
   } as const;
-  const fills = { 1: "#efe6d4", 2: "#e8dfca", 3: "#e1d6bc" } as const;
+  const fills = {
+    1: themeColor("face-fill-1"),
+    2: themeColor("face-fill-2"),
+    3: themeColor("face-fill-3"),
+  } as const;
 
   const pages: HTMLCanvasElement[] = [];
 
@@ -447,20 +478,19 @@ export async function renderSheets(
     const stripH = (s * SQRT3) / 2;
     const ox = (W - stripW) / 2;
     const oy = (H - stripH) / 2;
+    const stripGap = margin / 2;
+    // Keep the existing strip centered; add one matching copy above and below.
+    const stripOrigins = [oy - stripH - stripGap, oy, oy + stripH + stripGap];
 
     for (const side of ["front", "back"] as const) {
       const cv = document.createElement("canvas");
       cv.width = W;
       cv.height = H;
       const ctx = cv.getContext("2d")!;
-      drawSheetChrome(
-        ctx,
-        W,
-        H,
-        side === "front" ? "Front · cut along solid lines" : "Back · prints on the reverse",
-        dpi,
-      );
-      drawStrip(ctx, side, s, ox, oy, STRIP_CONFIG[side], imgs, fills, dpi);
+      drawSheetChrome(ctx, W, H, dpi);
+      for (const stripOy of stripOrigins) {
+        drawStrip(ctx, side, s, ox, stripOy, STRIP_CONFIG[side], imgs, fills, dpi);
+      }
       pages.push(cv);
     }
   } else {
@@ -486,8 +516,8 @@ export async function renderSheets(
     const ctx = cv.getContext("2d")!;
     drawSheetBackground(ctx, W, H, dpi);
 
-    if (supportMaxH > 0) {
-      await drawSupportCard(ctx, W / 2, supportTop, W - 2 * margin, supportMaxH, dpi);
+    if (STUDIO_PIQUE_CREDIT === "support-card" && supportMaxH > 0) {
+      await drawStudioPiqueSupportCard(ctx, W / 2, supportTop, W - 2 * margin, supportMaxH, dpi);
     }
 
     drawSingleSidedDoubleStrip(ctx, s, ox, upperOy, imgs, fills, dpi);

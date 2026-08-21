@@ -436,28 +436,22 @@ export function Animation() {
       <header className="border-b border-[var(--color-hairline)]">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5">
           <div>
-            <p className="label-eyebrow">3-D folding test · compound hinges</p>
-            <h1 className="mt-1 font-display text-2xl">Preparation + eight-phase strip fold</h1>
+            <p className="label-eyebrow">3-D folding animation</p>
+            <h1 className="mt-1 font-display text-2xl">Follow along and fold</h1>
           </div>
-          <HashLink
-            to="/"
-            className="text-sm text-[var(--color-ink-soft)] hover:text-[var(--color-ink)]"
-          >
-            Back to the atelier
-          </HashLink>
         </div>
       </header>
 
       <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-6 py-6">
-        <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-sm border border-[var(--color-hairline)] bg-[#f1eadc]">
+        <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-sm border border-[var(--color-hairline)] bg-[var(--color-paper-deep)]">
           <canvas
             ref={canvasRef}
             className="absolute inset-0 h-full w-full"
             aria-label="Animated flexagon strip preparation and eight-phase fold"
           />
-          <div className="pointer-events-none absolute left-4 top-4 rounded-sm border border-[var(--color-hairline)] bg-[var(--color-paper)]/90 px-3 py-2 text-xs text-[var(--color-ink-soft)]">
+          {/* <div className="pointer-events-none absolute left-4 top-4 rounded-sm border border-[var(--color-hairline)] bg-[var(--color-paper)]/90 px-3 py-2 text-xs text-[var(--color-ink-soft)]">
             {phaseLabel} · Diagnostic gap: 2 px
-          </div>
+          </div> */}
           {phaseNote && (
             <div className="pointer-events-none absolute bottom-4 left-1/2 w-[min(42rem,calc(100%-2rem))] -translate-x-1/2 rounded-sm border border-[var(--color-hairline)] bg-[var(--color-paper)]/95 px-4 py-3 text-center text-sm text-[var(--color-ink-soft)] shadow-sm">
               {phaseNote}

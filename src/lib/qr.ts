@@ -1,9 +1,12 @@
 import QRCode from "qrcode";
+import { themeColor } from "./theme-colors";
 
-export const STUDIO_PIQUE_QR_COLORS = {
-  ink: "#10223d",
-  paper: "#ffffff",
-} as const;
+export function studioPiqueQrColors() {
+  return {
+    ink: themeColor("studio-ink"),
+    paper: themeColor("white"),
+  };
+}
 
 type DrawQROptions = {
   x: number;
@@ -45,8 +48,8 @@ export async function drawQR(
     margin: options.margin ?? 2,
     errorCorrectionLevel: options.errorCorrectionLevel ?? "M",
     color: {
-      dark: options.darkColor ?? STUDIO_PIQUE_QR_COLORS.ink,
-      light: options.lightColor ?? STUDIO_PIQUE_QR_COLORS.paper,
+      dark: options.darkColor ?? studioPiqueQrColors().ink,
+      light: options.lightColor ?? studioPiqueQrColors().paper,
     },
   });
   ctx.drawImage(canvas, options.x, options.y, options.size, options.size);

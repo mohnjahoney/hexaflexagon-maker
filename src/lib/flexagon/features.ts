@@ -1,6 +1,7 @@
 /**
- * Keep the printed folding-instruction implementation available while it is
- * out of the product flow. Flip this back to `true` when the printed version
- * is ready to return.
+ * The lightest option is a small attribution; the card adds the QR code and
+ * support message. Keeping this as one choice prevents both from appearing
+ * accidentally at the same time.
  */
-export const PRINTED_FOLDING_INSTRUCTIONS_ENABLED = false;
+export type StudioPiqueCredit = "none" | "simple-name" | "support-card";
+export const STUDIO_PIQUE_CREDIT: StudioPiqueCredit = "simple-name";

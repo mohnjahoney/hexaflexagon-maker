@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { About } from "@/routes/about";
 import { Animation } from "@/routes/animation";
+import { Contact } from "@/routes/contact";
 import { HowToFold } from "@/routes/how-to-fold";
 import { Home } from "@/routes/index";
+import { Support } from "@/routes/support";
 
 const routes = {
-  "/": { title: "Hexaflexagon Atelier — compose & print", component: Home },
-  "/about": { title: "About — Hexaflexagon Atelier", component: About },
-  "/how-to-fold": { title: "How to fold — Hexaflexagon Atelier", component: HowToFold },
-  "/animation": { title: "Strip fold animation — Hexaflexagon Atelier", component: Animation },
+  "/": { title: "Hexaflexagon Maker — design & print", component: Home },
+  "/about": { title: "About — Hexaflexagon Maker", component: About },
+  "/how-to-fold": { title: "How to fold — Hexaflexagon Maker", component: HowToFold },
+  "/animation": { title: "Strip fold animation — Hexaflexagon Maker", component: Animation },
+  "/support": { title: "Support — Hexaflexagon Maker", component: Support },
+  "/contact": { title: "Contact — Hexaflexagon Maker", component: Contact },
 } as const;
 
 function currentPath() {
@@ -41,7 +45,7 @@ export function App() {
 
   const route = routes[path as keyof typeof routes];
   useEffect(() => {
-    document.title = route?.title ?? "Page not found — Hexaflexagon Atelier";
+    document.title = route?.title ?? "Page not found — Hexaflexagon Maker";
     window.scrollTo(0, 0);
   }, [route]);
 

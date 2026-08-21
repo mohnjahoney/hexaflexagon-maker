@@ -22,12 +22,12 @@ export function About() {
           later.
         </p>
         <p>
-          The <em>trihexaflexagon</em> is the gentlest of the family. Three faces, one strip, ten
-          triangles. This workshop takes three pictures of your choosing, slices each into the six
+          The <em>hexaflexagon</em> is the gentlest of the family. Three faces, one strip, ten
+          triangles. This maker takes three pictures of your choosing, slices each into the six
           wedges of a hexagon, and arranges them along the strip so that — once cut, creased and
-          glued — the toy in your hand quietly contains all three.
+          glued — the toy in your hand mysteriously contains all three.
         </p>
-        <p className="italic">What you do with it after that is up to you.</p>
+        <p className="italic">What will you design?</p>
       </div>
     </main>
   );

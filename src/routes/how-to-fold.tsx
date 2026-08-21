@@ -1,34 +1,45 @@
-import { PRINTED_FOLDING_INSTRUCTIONS_ENABLED } from "@/lib/flexagon/features";
 import { HashLink } from "@/components/HashLink";
 
 const STEPS = [
   {
     n: "I",
+    label: "Double-sided print",
     t: "Cut",
     b: "Cut around the solid outline of the strip. The shape will be a long parallelogram of ten triangles.",
   },
   {
+    n: "I",
+    label: "Single-sided print",
+    t: "Cut and Glue",
+    b: "Cut around the solid outline of the strip. Fold along the center seam and glue the two halves together. Do not glue the end triangles. The shape will be a long parallelogram of ten triangles.",
+  },
+  {
     n: "II",
-    t: "Score every fold",
-    b: "Press a firm crease along every dashed line, in both directions. Flatten the strip again.",
+    t: "Score Every Fold",
+    b: "Press a firm crease along every line, in both directions. Flatten the strip again.",
   },
   {
     n: "III",
-    t: "Fold the first thirds",
-    b: "With Face I up, fold the strip so the back-side wedges marked II and III come together. You'll be left with a shorter zig-zag.",
+    t: "Fold from the Left",
+    b: "With Face I up, lift the left side up and north so that the third and fourth triangles meet.",
   },
   {
     n: "IV",
-    t: "Roll it home",
-    b: "Continue folding into thirds until the strip wraps into a hexagon showing only Face I.",
+    t: "Fold from the Right",
+    b: "Take the last four triangle on the right side and fold them back and north. You should have a hexagon with a triangle on top.",
   },
   {
     n: "V",
-    t: "Glue the tab",
-    b: "A small amount of glue on the tab marked at the end of the strip joins the loop. Hold it for a minute, then let it dry.",
+    t: "Switch and Flip",
+    b: "Switch the rear arm with the front tab. Flip the whole thing over.",
   },
   {
     n: "VI",
+    t: "Glue the Tab",
+    b: "Add a small amount of glue on the tab marked 'glue'. Hold for a minute, then let dry.",
+  },
+  {
+    n: "VII",
     t: "Flex",
     b: "Pinch two adjacent triangles upward into a peak; press the opposite side down; open the hexagon from its centre. A new face appears.",
   },
@@ -42,9 +53,14 @@ export function HowToFold() {
       </HashLink>
       <h1 className="mt-6 font-display text-5xl">How to fold.</h1>
       <p className="mt-4 text-[var(--color-ink-soft)]">
-        Six unhurried steps.
-        {PRINTED_FOLDING_INSTRUCTIONS_ENABLED &&
-          " The same instructions are printed at the end of your PDF."}
+        Prefer to{" "}
+        <HashLink
+          to="/animation"
+          target="_blank"
+          className="text-[var(--color-oxblood)] hover:underline"
+        >
+          watch the instructions? ↗
+        </HashLink>
       </p>
 
       <ol className="mt-10 space-y-8">
@@ -55,6 +71,7 @@ export function HowToFold() {
           >
             <span className="roman-numeral font-display text-3xl leading-none">{s.n}</span>
             <div>
+              {s.label && <span className="label-eyebrow">{s.label}</span>}
               <h2 className="font-display text-2xl">{s.t}</h2>
               <p className="mt-2 text-[var(--color-ink-soft)]">{s.b}</p>
             </div>

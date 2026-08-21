@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { HEXAGON_OUTPUT_PATH, HEXAGON_OUTPUT_POINTS } from "@/lib/flexagon/hex-mask";
 
 interface CameraCaptureProps {
   open: boolean;
@@ -74,8 +75,25 @@ export function CameraCapture({ open, onCancel, onCapture }: CameraCaptureProps)
             {error} You can upload an image instead.
           </div>
         ) : (
-          <div className="mx-auto aspect-square w-[360px] overflow-hidden bg-black">
+          <div className="relative mx-auto aspect-square w-[360px] overflow-hidden bg-black">
             <video ref={videoRef} muted playsInline className="h-full w-full object-cover" />
+            <svg
+              viewBox="0 0 100 100"
+              className="pointer-events-none absolute inset-0 h-full w-full"
+              aria-hidden="true"
+            >
+              <path
+                d={`M0 0H100V100H0Z ${HEXAGON_OUTPUT_PATH}`}
+                fill="rgba(0,0,0,0.52)"
+                fillRule="evenodd"
+              />
+              <polygon
+                points={HEXAGON_OUTPUT_POINTS}
+                fill="none"
+                stroke="var(--color-paper)"
+                strokeWidth="0.8"
+              />
+            </svg>
           </div>
         )}
         <div className="flex justify-end gap-2 pt-2">
