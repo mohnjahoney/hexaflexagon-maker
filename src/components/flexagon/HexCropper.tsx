@@ -5,18 +5,28 @@ import { Button } from "@/components/ui/button";
 import { themeColor } from "@/lib/theme-colors";
 import { HEXAGON_OUTPUT_PATH, HEXAGON_OUTPUT_POINTS } from "@/lib/flexagon/hex-mask";
 
+/** How an image was placed in the crop window, so the same crop can be reopened. */
+export interface CropPlacement {
+  scale: number;
+  tx: number;
+  ty: number;
+  rotation: number;
+}
+
 interface HexCropperProps {
   open: boolean;
   src: string | null;
+  /** Placement to start from when reopening an image that was already cropped. */
+  initial?: CropPlacement | null;
   onCancel: () => void;
-  onConfirm: (croppedDataUrl: string) => void;
+  onConfirm: (croppedDataUrl: string, placement: CropPlacement) => void;
 }
 
 const OUT_SIZE = 1024;
 const CONTROL_MIN_RADIUS = 72;
 const CONTROL_MAX_RADIUS = 140;
 
-export function HexCropper({ open, src, onCancel, onConfirm }: HexCropperProps) {
+export function HexCropper({ open, src, initial, onCancel, onConfirm }: HexCropperProps) {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [scale, setScale] = useState(1);
   const [minimumScale, setMinimumScale] = useState(1);
@@ -29,6 +39,8 @@ export function HexCropper({ open, src, onCancel, onConfirm }: HexCropperProps) 
 
   useEffect(() => {
     if (!src) return setImg(null);
+    // Re-run on every opening so an abandoned adjustment does not linger.
+    if (!open) return;
     const i = new Image();
     i.crossOrigin = "anonymous";
     i.onload = () => {
@@ -40,14 +52,16 @@ export function HexCropper({ open, src, onCancel, onConfirm }: HexCropperProps) 
         const h = stage.clientHeight;
         const s = Math.max(w / i.width, h / i.height);
         setMinimumScale(s);
-        setScale(s);
-        setTx(0);
-        setTy(0);
-        setRotation(0);
+        setScale(initial?.scale ?? s);
+        setTx(initial?.tx ?? 0);
+        setTy(initial?.ty ?? 0);
+        setRotation(initial?.rotation ?? 0);
       }
     };
     i.src = src;
-  }, [src]);
+    // `initial` is read once per opening; it only changes when a crop is confirmed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src, open]);
 
   function onPointerDown(e: React.PointerEvent) {
     (e.target as Element).setPointerCapture(e.pointerId);
@@ -138,7 +152,7 @@ export function HexCropper({ open, src, onCancel, onConfirm }: HexCropperProps) 
     ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
     ctx.restore();
 
-    onConfirm(canvas.toDataURL("image/jpeg", 0.92));
+    onConfirm(canvas.toDataURL("image/jpeg", 0.92), { scale, tx, ty, rotation });
   }
 
   const controlAngle = (rotation * Math.PI) / 180;
@@ -219,10 +233,25 @@ export function HexCropper({ open, src, onCancel, onConfirm }: HexCropperProps) 
                 y1="199"
                 x2={controlX}
                 y2={controlY}
+                stroke="var(--color-oxblood)"
+                strokeWidth="5.5"
+              />
+              <line
+                x1="199"
+                y1="199"
+                x2={controlX}
+                y2={controlY}
                 stroke="var(--color-paper)"
                 strokeWidth="1.5"
               />
-              <circle cx="199" cy="199" r="6" fill="var(--color-paper)" />
+              <circle
+                cx="199"
+                cy="199"
+                r="5.5"
+                fill="var(--color-paper)"
+                stroke="var(--color-oxblood)"
+                strokeWidth="3"
+              />
               <circle
                 cx={controlX}
                 cy={controlY}

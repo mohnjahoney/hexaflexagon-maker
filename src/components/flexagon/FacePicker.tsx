@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { Camera, Cat, ImagePlus, Loader2 } from "lucide-react";
+import { Camera, ImagePlus, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { HexCropper } from "./HexCropper";
+import { HexCropper, type CropPlacement } from "./HexCropper";
 import { CameraCapture } from "./CameraCapture";
-import { toast } from "sonner";
+import { IdeasPanel } from "./IdeasPanel";
 import { TRIANGLE_DEBUG } from "@/lib/flexagon/debug";
 
 interface FacePickerProps {
@@ -15,12 +15,30 @@ interface FacePickerProps {
 export function FacePicker({ numeral, value, onChange }: FacePickerProps) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [rawSrc, setRawSrc] = useState<string | null>(null);
+  const [placement, setPlacement] = useState<CropPlacement | null>(null);
+  // The uncropped original behind the current face, and how it was cropped.
+  const [applied, setApplied] = useState<{
+    face: string;
+    src: string;
+    placement: CropPlacement;
+  } | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
   const [camOpen, setCamOpen] = useState(false);
-  const [catBusy, setCatBusy] = useState(false);
+  const [ideasOpen, setIdeasOpen] = useState(false);
 
   function openCrop(src: string) {
     setRawSrc(src);
+    setPlacement(null);
+    setCropOpen(true);
+  }
+
+  function reopenCrop() {
+    if (!value) return;
+    // Go back to the original with its crop if we have it; a face that was
+    // never cropped here (a bundled default) opens as it is.
+    const original = applied?.face === value ? applied : null;
+    setRawSrc(original?.src ?? value);
+    setPlacement(original?.placement ?? null);
     setCropOpen(true);
   }
 
@@ -31,30 +49,6 @@ export function FacePicker({ numeral, value, onChange }: FacePickerProps) {
     r.onload = () => openCrop(r.result as string);
     r.readAsDataURL(f);
     e.target.value = "";
-  }
-
-  async function fetchCat() {
-    if (catBusy) return;
-    setCatBusy(true);
-    try {
-      const res = await fetch(
-        `https://cataas.com/cat?width=900&height=900&t=${Date.now()}-${Math.random()}`,
-      );
-      if (!res.ok) throw new Error(`cataas ${res.status}`);
-      const blob = await res.blob();
-      const dataUrl: string = await new Promise((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(r.result as string);
-        r.onerror = reject;
-        r.readAsDataURL(blob);
-      });
-      openCrop(dataUrl);
-    } catch (err) {
-      console.error("[cats] fetch failed", err);
-      toast.error("Couldn't reach the cat archive. Try again in a moment.");
-    } finally {
-      setCatBusy(false);
-    }
   }
 
   return (
@@ -75,7 +69,13 @@ export function FacePicker({ numeral, value, onChange }: FacePickerProps) {
           }}
         />
         {value ? (
-          <>
+          <button
+            type="button"
+            onClick={reopenCrop}
+            aria-label={`Adjust the crop of face ${numeral}`}
+            title="Adjust crop"
+            className="group absolute inset-0 cursor-pointer transition-transform duration-200 ease-out hover:scale-[1.03] focus-visible:scale-[1.03] focus-visible:outline-none"
+          >
             <img
               src={value}
               alt=""
@@ -83,7 +83,20 @@ export function FacePicker({ numeral, value, onChange }: FacePickerProps) {
               style={{ clipPath: "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)" }}
             />
             {TRIANGLE_DEBUG.faceOverlay && <FaceTriangleOverlay />}
-          </>
+            <svg
+              viewBox="0 0 86.60254 100"
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 h-full w-full overflow-visible opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+            >
+              <polygon
+                points="43.30127,0 86.60254,25 86.60254,75 43.30127,100 0,75 0,25"
+                fill="none"
+                stroke="var(--color-oxblood)"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         ) : (
           <div
             className="absolute inset-0 grid place-items-center text-[var(--color-ink-soft)]"
@@ -105,21 +118,30 @@ export function FacePicker({ numeral, value, onChange }: FacePickerProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={fetchCat}
-          disabled={catBusy}
-          title="Fetch a random cat from cataas.com"
+          onClick={() => setIdeasOpen(true)}
+          title="Emoji, text, or a random cat"
         >
-          {catBusy ? <Loader2 className="animate-spin" /> : <Cat />} Cats
+          <Lightbulb /> Ideas
         </Button>
       </div>
 
       <HexCropper
         open={cropOpen}
         src={rawSrc}
+        initial={placement}
         onCancel={() => setCropOpen(false)}
-        onConfirm={(d) => {
+        onConfirm={(d, cropped) => {
+          if (rawSrc) setApplied({ face: d, src: rawSrc, placement: cropped });
           onChange(d);
           setCropOpen(false);
+        }}
+      />
+      <IdeasPanel
+        open={ideasOpen}
+        onCancel={() => setIdeasOpen(false)}
+        onPick={(d) => {
+          setIdeasOpen(false);
+          openCrop(d);
         }}
       />
       <CameraCapture

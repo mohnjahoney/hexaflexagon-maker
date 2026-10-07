@@ -3,15 +3,21 @@ import { Toaster } from "@/components/ui/sonner";
 import { About } from "@/routes/about";
 import { Animation } from "@/routes/animation";
 import { Contact } from "@/routes/contact";
-import { HowToFold } from "@/routes/how-to-fold";
+import { Flex } from "@/routes/flex";
 import { Home } from "@/routes/index";
 import { Support } from "@/routes/support";
 
 const routes = {
   "/": { title: "Hexaflexagon Maker — design & print", component: Home },
   "/about": { title: "About — Hexaflexagon Maker", component: About },
-  "/how-to-fold": { title: "How to fold — Hexaflexagon Maker", component: HowToFold },
-  "/animation": { title: "Strip fold animation — Hexaflexagon Maker", component: Animation },
+  // The written guide was replaced by the animation; old links still land somewhere useful.
+  "/how-to-fold": { title: "Fold and flex — Hexaflexagon Maker", component: Flex },
+  "/animation": { title: "Fold and flex — Hexaflexagon Maker", component: Flex },
+  // Legacy: the original folding animation, kept for reference.
+  "/animation-legacy": {
+    title: "Strip fold animation (legacy) — Hexaflexagon Maker",
+    component: Animation,
+  },
   "/support": { title: "Support — Hexaflexagon Maker", component: Support },
   "/contact": { title: "Contact — Hexaflexagon Maker", component: Contact },
 } as const;

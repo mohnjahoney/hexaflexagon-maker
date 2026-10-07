@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Download, ExternalLink, Loader2, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FacePicker } from "@/components/flexagon/FacePicker";
+import { FlexIcon } from "@/components/flexagon/FlexIcon";
 import { FlexagonPreview } from "@/components/flexagon/FlexagonPreview";
 import { TriangleArrayPanel } from "@/components/flexagon/TriangleArrayPanel";
 import { buildFlexagonPdf } from "@/lib/flexagon/pdf";
@@ -70,15 +71,21 @@ export function Home() {
     <main className="min-h-screen">
       <Header />
 
-      <section className="mx-auto max-w-6xl px-6 pt-10 md:pt-16">
-        <p className="label-eyebrow">A small paper-toy maker · est. today</p>
-        <h1 className="mt-3 max-w-3xl font-display text-5xl leading-[1.05] md:text-7xl">
-          Design your own hexaflexagon.
-        </h1>
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--color-ink-soft)]">
-          Upload three images, arrange them, and print a paper toy that folds through its center. At
-          first it appears to have two sides, but watch how a third side can be revealed.
-        </p>
+      <section className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-6 pt-10 md:pt-16">
+        <div>
+          <p className="label-eyebrow">A small paper-toy maker · est. today</p>
+          <h1 className="mt-3 max-w-3xl font-display text-5xl leading-[1.05] md:text-7xl">
+            Design your own hexaflexagon.
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--color-ink-soft)]">
+            Upload three images, arrange them, and print a paper toy that folds through its center.
+            At first it appears to have two sides, but watch how a third side can be revealed.
+          </p>
+        </div>
+        <FlexIcon
+          faces={faces}
+          className="hidden h-40 w-40 shrink-0 sm:block md:h-[230px] md:w-[230px]"
+        />
       </section>
 
       <section className="mx-auto mt-14 grid max-w-6xl grid-cols-1 gap-6 px-6 md:grid-cols-3">
@@ -206,14 +213,6 @@ function Header() {
           <HashLink to="/contact" className="hover:text-[var(--color-ink)]">
             Contact
           </HashLink>
-          <a
-            href="#/how-to-fold"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[var(--color-ink)]"
-          >
-            How to fold ↗
-          </a>
         </nav>
       </div>
     </header>

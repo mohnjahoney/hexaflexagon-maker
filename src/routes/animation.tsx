@@ -1,3 +1,7 @@
+// LEGACY: the original hand-choreographed folding animation. It is no longer
+// part of the main flow (see ../paper-model and routes/flex.tsx) and is kept
+// only for reference at #/animation-legacy. Do not build new features on it.
+
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
