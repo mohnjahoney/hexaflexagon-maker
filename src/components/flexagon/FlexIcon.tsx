@@ -21,7 +21,7 @@ export function FlexIcon({ faces, className }: FlexIconProps) {
 
     let cancelled = false;
     let frame = 0;
-    const loop = buildFlexLoop(finishedHexagon(), { flexMs: 6500, holdMs: 3500, closeUp: true });
+    const loop = buildFlexLoop(finishedHexagon(), { flexMs: 5200, holdMs: 2625, closeUp: true });
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     void renderStripAssets(facesRef.current)

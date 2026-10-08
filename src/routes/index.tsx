@@ -77,10 +77,18 @@ export function Home() {
           <h1 className="mt-3 max-w-3xl font-display text-5xl leading-[1.05] md:text-7xl">
             Design your own hexaflexagon.
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--color-ink-soft)]">
-            Upload three images, arrange them, and print a paper toy that folds through its center.
-            At first it appears to have two sides, but watch how a third side can be revealed.
-          </p>
+          <div className="mt-6 max-w-2xl space-y-4 text-base leading-relaxed text-[var(--color-ink-soft)]">
+            <p>Choose three images, arrange them, and print your own paper hexaflexagon!</p>
+            <p>
+              A hexaflexagon is a mysterious toy that folds through its own middle (that's kind of
+              amazing).
+            </p>
+            <p>
+              First you see one side, then the second, ... then the third!?
+              <br />
+              Play and discover for yourself.
+            </p>
+          </div>
         </div>
         <FlexIcon
           faces={faces}
